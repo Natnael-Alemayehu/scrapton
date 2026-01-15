@@ -63,9 +63,7 @@ func main() {
 
 	cfg.wg.Wait()
 
-	timestamp := time.Now().Format("2006-01-02_15-04-05")
-
-	filename := fmt.Sprintf("./exports/report_csv_%v.csv", timestamp)
+	filename := fmt.Sprintf("./exports/report_csv_%v.csv", time.Now().Unix())
 
 	if err := writeCSVReport(cfg.pages, filename); err != nil {
 		fmt.Printf("err: %v", err)

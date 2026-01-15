@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"time"
 )
 
 func main() {
@@ -62,9 +63,13 @@ func main() {
 
 	cfg.wg.Wait()
 
-	fmt.Printf("\nCrawl Result:\n")
-	for normalizedURL, page := range cfg.pages {
-		fmt.Printf("   %s - %v\n", normalizedURL, len(page.OutgoingLinks))
+	timestamp := time.Now().Format("2006-01-02_15-04-05")
+
+	filename := fmt.Sprintf("./exports/report_csv_%v.csv", timestamp)
+
+	if err := writeCSVReport(cfg.pages, filename); err != nil {
+		fmt.Printf("err: %v", err)
+		os.Exit(1)
 	}
 
 }

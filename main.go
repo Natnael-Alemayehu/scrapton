@@ -16,21 +16,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	url, err := url.Parse(os.Args[1])
+	rawBaseURL, err := url.Parse(os.Args[1])
 	if err != nil {
 		fmt.Println("Passed argument is not a valid url")
 		os.Exit(1)
 	}
 
-	pages := map[string]int{}
+	pages := make(map[string]int)
 
-	crawlPage(url.String(), url.String(), pages)
+	crawlPage(rawBaseURL.String(), rawBaseURL.String(), pages)
 
-	fmt.Println("Done crawling!")
-	fmt.Println("crawl result: ")
-
-	for k, v := range pages {
-		fmt.Printf("\t- url: %v - %v \n", k, v)
+	fmt.Printf("\nCrawl Result:\n")
+	for normalizedURL, count := range pages {
+		fmt.Printf("   %d - %s\n", count, normalizedURL)
 	}
 
 }

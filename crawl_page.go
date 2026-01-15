@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"net/url"
-	"strings"
 )
 
 func crawlPage(rawBaseURL, rawCurrentURL string, pages map[string]int) {
-	if !strings.Contains(rawCurrentURL, rawBaseURL) {
+	currentURL, err := url.Parse(rawCurrentURL)
+	if err != nil {
+		fmt.Printf("Error - crawlPage: couldn't parse URL '%s': %v\n", rawCurrentURL, err)
 		return
 	}
 
@@ -17,34 +18,40 @@ func crawlPage(rawBaseURL, rawCurrentURL string, pages map[string]int) {
 		return
 	}
 
-	url, err := normalizeURL(rawCurrentURL)
+	// skip other websites
+	if currentURL.Hostname() != baseURL.Hostname() {
+		return
+	}
+
+	normalizedURL, err := normalizeURL(rawCurrentURL)
 	if err != nil {
 		fmt.Printf("error normalizing url: %v \n", err)
 		return
 	}
 
-	_, ok := pages[url]
-	if ok {
-		pages[url]++
+	// increment if visited
+	if _, visited := pages[normalizedURL]; visited {
+		pages[normalizedURL]++
 		return
 	}
-	pages[url] = 1
 
-	html, err := getHTML("https://" + url)
+	pages[normalizedURL] = 1
+
+	fmt.Printf("crawling %s\n", rawCurrentURL)
+
+	html, err := getHTML(rawCurrentURL)
 	if err != nil {
 		fmt.Printf("Error getHTML: %v \n", err)
 		return
 	}
 
-	fmt.Printf("Crawling URL: %v \n", url)
-
-	urls, err := getURLsFromHTML(html, baseURL)
+	Nexturls, err := getURLsFromHTML(html, baseURL)
 	if err != nil {
 		fmt.Printf("Error getting urls: %v \n", err)
 	}
 
-	for _, v := range urls {
-		crawlPage(rawBaseURL, v, pages)
+	for _, nextURL := range Nexturls {
+		crawlPage(rawBaseURL, nextURL, pages)
 	}
 
 }

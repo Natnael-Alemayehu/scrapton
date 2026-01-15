@@ -16,14 +16,14 @@ func TestExtractPageData(t *testing.T) {
 			name:    "basic: h1, main paragraph, relative link and img",
 			pageURL: "https://blog.boot.dev",
 			html: `
-<html>
-  <body>
-    <h1>Hello World</h1>
-    <main><p>First paragraph inside main.</p></main>
-    <a href="/about">About</a>
-    <img src="/logo.png" alt="Logo">
-  </body>
-</html>`,
+				<html>
+				<body>
+					<h1>Hello World</h1>
+					<main><p>First paragraph inside main.</p></main>
+					<a href="/about">About</a>
+					<img src="/logo.png" alt="Logo">
+				</body>
+				</html>`,
 			want: PageData{
 				URL:            "https://blog.boot.dev",
 				H1:             "Hello World",
@@ -36,14 +36,14 @@ func TestExtractPageData(t *testing.T) {
 			name:    "fallback paragraph when no <main>",
 			pageURL: "https://blog.boot.dev",
 			html: `
-<html>
-  <body>
-    <h1>Title</h1>
-    <p>Outside paragraph wins.</p>
-    <a href="/x">x</a>
-    <img src="/img.png">
-  </body>
-</html>`,
+				<html>
+				<body>
+					<h1>Title</h1>
+					<p>Outside paragraph wins.</p>
+					<a href="/x">x</a>
+					<img src="/img.png">
+				</body>
+				</html>`,
 			want: PageData{
 				URL:            "https://blog.boot.dev",
 				H1:             "Title",
@@ -56,11 +56,11 @@ func TestExtractPageData(t *testing.T) {
 			name:    "malformed HTML still parsed; absolute link and image",
 			pageURL: "https://blog.boot.dev",
 			html: `
-<html body>
-  <h1>Messy</h1>
-  <a href="https://other.com/path">Other</a>
-  <img src="https://cdn.boot.dev/banner.jpg">
-</html body>`,
+				<html body>
+				<h1>Messy</h1>
+				<a href="https://other.com/path">Other</a>
+				<img src="https://cdn.boot.dev/banner.jpg">
+				</html body>`,
 			want: PageData{
 				URL:            "https://blog.boot.dev",
 				H1:             "Messy",
@@ -73,12 +73,12 @@ func TestExtractPageData(t *testing.T) {
 			name:    "no h1 and no paragraph",
 			pageURL: "https://blog.boot.dev",
 			html: `
-<html>
-  <body>
-    <a href="/only-link">Only link</a>
-    <img src="/only.png">
-  </body>
-</html>`,
+				<html>
+				<body>
+					<a href="/only-link">Only link</a>
+					<img src="/only.png">
+				</body>
+				</html>`,
 			want: PageData{
 				URL:            "https://blog.boot.dev",
 				H1:             "",
@@ -91,14 +91,14 @@ func TestExtractPageData(t *testing.T) {
 			name:    "multiple links and images preserve order",
 			pageURL: "https://blog.boot.dev",
 			html: `
-<html><body>
-  <h1>t</h1>
-  <main><p>p</p></main>
-  <a href="/a1">a1</a>
-  <a href="https://x.dev/a2">a2</a>
-  <img src="/i1.png">
-  <img src="https://x.dev/i2.png">
-</body></html>`,
+				<html><body>
+				<h1>t</h1>
+				<main><p>p</p></main>
+				<a href="/a1">a1</a>
+				<a href="https://x.dev/a2">a2</a>
+				<img src="/i1.png">
+				<img src="https://x.dev/i2.png">
+				</body></html>`,
 			want: PageData{
 				URL:            "https://blog.boot.dev",
 				H1:             "t",
@@ -117,14 +117,14 @@ func TestExtractPageData(t *testing.T) {
 			name:    "invalid base URL → empty link/image slices",
 			pageURL: `:\\invalidBaseURL`,
 			html: `
-<html>
-  <body>
-    <h1>Title</h1>
-    <p>Paragraph</p>
-    <a href="/path">path</a>
-    <img src="/logo.png">
-  </body>
-</html>`,
+				<html>
+				<body>
+					<h1>Title</h1>
+					<p>Paragraph</p>
+					<a href="/path">path</a>
+					<img src="/logo.png">
+				</body>
+				</html>`,
 			want: PageData{
 				URL:            `:\\invalidBaseURL`,
 				H1:             "Title",

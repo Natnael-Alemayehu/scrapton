@@ -7,12 +7,16 @@ import (
 )
 
 func normalizeURL(inputURL string) (string, error) {
-	inputURL, _ = strings.CutSuffix(inputURL, "/")
-
-	url, err := url.Parse(inputURL)
+	parsedURL, err := url.Parse(inputURL)
 	if err != nil {
-		return "", fmt.Errorf("url parse err: %v", err)
+		return "", fmt.Errorf("couldn't parse URL: %w", err)
 	}
 
-	return url.Host + url.Path, nil
+	fullPath := parsedURL.Host + parsedURL.Path
+
+	fullPath = strings.ToLower(fullPath)
+
+	fullPath = strings.TrimSuffix(fullPath, "/")
+
+	return fullPath, nil
 }

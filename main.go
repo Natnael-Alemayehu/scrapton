@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"strconv"
 	"sync"
 )
 
@@ -12,18 +13,40 @@ func main() {
 	if len(arg) < 1 {
 		fmt.Println("no website provided")
 		os.Exit(1)
-	} else if len(arg) > 1 {
+	} else if len(arg) > 3 {
 		fmt.Println("too many arguments provided")
 		os.Exit(1)
 	}
 
-	rawBaseURL, err := url.Parse(os.Args[1])
+	if os.Args[1] == "help" {
+		fmt.Println("./crawller <URL> <maxConcurrent> <maxPages>")
+		fmt.Println("Default maxConcurrent: 5, maxPages: 10")
+		os.Exit(0)
+	}
+
+	maxConcurrent := 5
+	maxPages := 10
+
+	rawBaseURL, err := url.Parse(arg[0])
 	if err != nil {
 		fmt.Println("Passed argument is not a valid url")
 		os.Exit(1)
 	}
 
-	maxConcurrent := 5
+	if len(arg) > 1 {
+		maxConcurrentArg := arg[1]
+		maxConcurrent, err = strconv.Atoi(maxConcurrentArg)
+		if err != nil {
+			fmt.Println("max concurrency must be valid integer")
+		}
+
+		maxPagesArgs := arg[2]
+		maxPages, err = strconv.Atoi(maxPagesArgs)
+		if err != nil {
+			fmt.Println("max concurrency must be valid integer")
+		}
+
+	}
 
 	cfg := config{
 		pages:              make(map[string]PageData),
@@ -31,6 +54,7 @@ func main() {
 		mu:                 &sync.Mutex{},
 		concurrencyControl: make(chan struct{}, maxConcurrent),
 		wg:                 &sync.WaitGroup{},
+		maxPages:           maxPages,
 	}
 
 	cfg.wg.Add(1)

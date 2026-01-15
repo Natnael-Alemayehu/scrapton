@@ -12,6 +12,7 @@ type config struct {
 	mu                 *sync.Mutex
 	concurrencyControl chan struct{}
 	wg                 *sync.WaitGroup
+	maxPages           int
 }
 
 func (cfg *config) crawlPage(rawCurrentURL string) {
@@ -27,6 +28,13 @@ func (cfg *config) crawlPage(rawCurrentURL string) {
 		fmt.Printf("Error - crawlPage: couldn't parse URL '%s': %v\n", rawCurrentURL, err)
 		return
 	}
+
+	cfg.mu.Lock()
+	if len(cfg.pages) >= cfg.maxPages {
+		cfg.mu.Unlock()
+		return
+	}
+	cfg.mu.Unlock()
 
 	// skip other websites
 	if currentURL.Hostname() != cfg.baseURL.Hostname() {

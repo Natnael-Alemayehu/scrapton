@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"sync"
 )
 
 func main() {
@@ -22,13 +23,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	pages := make(map[string]int)
+	maxConcurrent := 5
 
-	crawlPage(rawBaseURL.String(), rawBaseURL.String(), pages)
+	cfg := config{
+		pages:              make(map[string]PageData),
+		baseURL:            rawBaseURL,
+		mu:                 &sync.Mutex{},
+		concurrencyControl: make(chan struct{}, maxConcurrent),
+		wg:                 &sync.WaitGroup{},
+	}
+
+	cfg.wg.Add(1)
+	go cfg.crawlPage(rawBaseURL.String())
+
+	cfg.wg.Wait()
 
 	fmt.Printf("\nCrawl Result:\n")
-	for normalizedURL, count := range pages {
-		fmt.Printf("   %d - %s\n", count, normalizedURL)
+	for normalizedURL, page := range cfg.pages {
+		fmt.Printf("   %s - %v\n", normalizedURL, len(page.OutgoingLinks))
 	}
 
 }
